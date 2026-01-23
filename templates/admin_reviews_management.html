@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+{% block title %}Review Management - Admin{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="container mx-auto px-4">
+    <!-- Header -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-3xl font-bold text-gray-800">Review Management</h1>
+        <div class="flex items-center space-x-4">
+          <span class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+            {{ total_reviews }} Total Reviews
+          </span>
+          <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+            {{ featured_reviews }} Featured on Home
+          </span>
+        </div>
+      </div>
+      <p class="text-gray-600">Select reviews to feature on the home page and manage existing reviews</p>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <input type="checkbox" id="selectAll" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+          <label for="selectAll" class="text-gray-700 font-medium">Select All</label>
+        </div>
+        <div class="flex space-x-3">
+          <button onclick="bulkFeature()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-300">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Feature Selected
+          </button>
+          <button onclick="bulkUnfeature()" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors duration-300">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            Unfeature Selected
+          </button>
+          <button onclick="bulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            Delete Selected
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Table -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-6 py-4 text-left">
+                <input type="checkbox" id="headerSelectAll" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Review</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Featured</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for review in reviews %}
+            <tr class="hover:bg-gray-50 transition-colors duration-200">
+              <td class="px-6 py-4">
+                <input type="checkbox" class="review-checkbox w-5 h-5 text-blue-600 rounded focus:ring-blue-500" data-id="{{ review.id }}">
+              </td>
+              <td class="px-6 py-4">
+                <div>
+                  <div class="text-sm font-medium text-gray-900">{{ review.name }}</div>
+                  <div class="text-sm text-gray-500">{{ review.email }}</div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center">
+                  {% for i in range(review.stars) %}
+                  <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                  </svg>
+                  {% endfor %}
+                  <span class="ml-2 text-sm text-gray-600">{{ review.stars }}/5</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-sm text-gray-900 max-w-xs truncate" title="{{ review.message }}">
+                  {{ review.message[:100] }}{% if review.message|length > 100 %}...{% endif %}
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-sm text-gray-500">{{ review.created_at[:10] }}</div>
+              </td>
+              <td class="px-6 py-4">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" class="sr-only peer" data-review-id="{{ review.id }}" 
+                         {% if review.show_on_home %}checked{% endif %} onchange="toggleFeature({{ review.id }}, this.checked)">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex space-x-2">
+                  <button onclick="viewReview({{ review.id }})" class="text-blue-600 hover:text-blue-900 transition-colors duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                  </button>
+                  <button onclick="deleteReview({{ review.id }})" class="text-red-600 hover:text-red-900 transition-colors duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      {% if not reviews %}
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No reviews found</h3>
+        <p class="mt-1 text-sm text-gray-500">Get started by adding some customer reviews.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Review Details Modal -->
+<div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 relative m-4 max-h-[90vh] overflow-y-auto">
+    <button onclick="closeReviewModal()" class="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700">&times;</button>
+    <h3 class="text-xl font-bold mb-4">Review Details</h3>
+    <div id="reviewModalContent"></div>
+  </div>
+</div>
+
+<script>
+// Select all functionality
+document.getElementById('selectAll').addEventListener('change', function() {
+  const checkboxes = document.querySelectorAll('.review-checkbox');
+  checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+});
+
+document.getElementById('headerSelectAll').addEventListener('change', function() {
+  const checkboxes = document.querySelectorAll('.review-checkbox');
+  checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+});
+
+// Toggle feature status
+function toggleFeature(reviewId, isFeatured) {
+  fetch('/admin/toggle-review-feature', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      review_id: reviewId,
+      featured: isFeatured
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert('Error updating review status');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error updating review status');
+  });
+}
+
+// Bulk operations
+function getSelectedReviews() {
+  const checkboxes = document.querySelectorAll('.review-checkbox:checked');
+  return Array.from(checkboxes).map(cb => parseInt(cb.dataset.id));
+}
+
+function bulkFeature() {
+  const selectedIds = getSelectedReviews();
+  if (selectedIds.length === 0) {
+    alert('Please select reviews to feature');
+    return;
+  }
+  
+  fetch('/admin/bulk-feature-reviews', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ review_ids: selectedIds })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert('Error featuring reviews');
+    }
+  });
+}
+
+function bulkUnfeature() {
+  const selectedIds = getSelectedReviews();
+  if (selectedIds.length === 0) {
+    alert('Please select reviews to unfeature');
+    return;
+  }
+  
+  fetch('/admin/bulk-unfeature-reviews', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ review_ids: selectedIds })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert('Error unfeaturing reviews');
+    }
+  });
+}
+
+function bulkDelete() {
+  const selectedIds = getSelectedReviews();
+  if (selectedIds.length === 0) {
+    alert('Please select reviews to delete');
+    return;
+  }
+  
+  if (confirm(`Are you sure you want to delete ${selectedIds.length} review(s)? This action cannot be undone.`)) {
+    fetch('/admin/bulk-delete-reviews', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ review_ids: selectedIds })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Error deleting reviews');
+      }
+    });
+  }
+}
+
+// View review details
+function viewReview(reviewId) {
+  fetch(`/admin/review-details/${reviewId}`)
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      const content = `
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Customer Name</label>
+            <p class="text-gray-900">${data.review.name}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <p class="text-gray-900">${data.review.email}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Phone</label>
+            <p class="text-gray-900">${data.review.phone}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Rating</label>
+            <div class="flex items-center">
+              ${Array(data.review.stars).fill('<svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>').join('')}
+              <span class="ml-2">${data.review.stars}/5</span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Review Message</label>
+            <p class="text-gray-900">${data.review.message}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Date</label>
+            <p class="text-gray-900">${data.review.created_at}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Featured on Home</label>
+            <p class="text-gray-900">${data.review.show_on_home ? 'Yes' : 'No'}</p>
+          </div>
+        </div>
+      `;
+      document.getElementById('reviewModalContent').innerHTML = content;
+      document.getElementById('reviewModal').classList.remove('hidden');
+    } else {
+      alert('Error loading review details');
+    }
+  });
+}
+
+function closeReviewModal() {
+  document.getElementById('reviewModal').classList.add('hidden');
+}
+
+// Delete single review
+function deleteReview(reviewId) {
+  if (confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
+    fetch(`/admin/delete-review/${reviewId}`, {
+      method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Error deleting review');
+      }
+    });
+  }
+}
+</script>
+{% endblock %}
